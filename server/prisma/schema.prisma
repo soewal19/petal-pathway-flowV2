@@ -1,0 +1,111 @@
+// Prisma schema for flowers shop
+// This file defines the database schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Shop {
+  id          String   @id @default(cuid())
+  name        String
+  location    String
+  address     String
+  phone       String
+  hours       String
+  latitude    Float
+  longitude   Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  flowers     Flower[]
+  orders      Order[]
+
+  @@map("shops")
+}
+
+model Flower {
+  id          String   @id @default(cuid())
+  name        String
+  price       Float
+  image       String
+  description String
+  shopId      String
+  dateAdded   DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  shop        Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  cartItems   CartItem[]
+  orderItems  OrderItem[]
+
+  @@map("flowers")
+}
+
+model CartItem {
+  id        String   @id @default(cuid())
+  flowerId  String
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  flower    Flower   @relation(fields: [flowerId], references: [id], onDelete: Cascade)
+
+  @@map("cart_items")
+}
+
+model Order {
+  id            String   @id @default(cuid())
+  customerName  String
+  customerEmail String
+  customerPhone String
+  customerAddress String
+  total         Float
+  originalTotal Float?
+  discountAmount Float?
+  orderDate     DateTime @default(now())
+  shopId        String
+  couponId      String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  shop          Shop         @relation(fields: [shopId], references: [id])
+  coupon        Coupon?      @relation(fields: [couponId], references: [id])
+  orderItems    OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id        String   @id @default(cuid())
+  orderId   String
+  flowerId  String
+  quantity  Int
+  price     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  order     Order      @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  flower    Flower     @relation(fields: [flowerId], references: [id])
+
+  @@map("order_items")
+}
+
+model Coupon {
+  id          String   @id @default(cuid())
+  name        String
+  code        String   @unique
+  discount    Float
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  orders      Order[]
+
+  @@map("coupons")
+}
