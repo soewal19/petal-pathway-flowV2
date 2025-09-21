@@ -1,0 +1,21 @@
+{
+  "name": "flowers-fullstack",
+  "version": "1.0.0",
+  "description": "Fullstack flowers shop with React frontend and NestJS backend",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:frontend": "vite",
+    "dev:backend": "cd server && npm run start:dev",
+    "build": "npm run build:frontend && npm run build:backend",
+    "build:frontend": "vite build",
+    "build:backend": "cd server && npm run build",
+    "start": "concurrently \"npm run start:backend\" \"npm run start:frontend\"",
+    "start:frontend": "vite preview",
+    "start:backend": "cd server && npm run start:prod",
+    "install:all": "npm install && cd server && npm install",
+    "setup": "npm run install:all && cd server && npm run prisma:generate && npm run prisma:migrate && npm run prisma:seed"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  backend:
+    build: 
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: flowers_backend
+    expose:
+      - "3000"
+    volumes:
+      - ./server/prisma/dev.db:/app/prisma/dev.db
+    environment:
+      - DATABASE_URL=file:./dev.db
+      - NODE_ENV=production
+    command: sh -c "npx prisma migrate deploy && npm run start:prod"
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: flowers_frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+networks:
+  default:
+    name: flowers_network
